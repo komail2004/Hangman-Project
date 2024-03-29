@@ -1,5 +1,6 @@
 import pygame
 
+# This is a test.
 def main():
 	pass
 
