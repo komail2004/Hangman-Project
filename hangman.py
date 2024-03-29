@@ -1,6 +1,9 @@
 import pygame
 
-# This is a test.
+# Read the contents of the text file.
+def loadText():
+	pass
+
 def main():
 	pass
 
