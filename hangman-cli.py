@@ -22,7 +22,7 @@ def printPrompt(word, rights):
 
 def main():
 	fileName = "wordlist.txt"
-	word = getText(fileName)
+	word = getText(fileName).lower()
 	max_guesses = 6
 	rights = []
 	
