@@ -10,6 +10,7 @@ def getText(fileName):
 
 	return randomLine.replace('\n', '')
 
+# Print the prompt. Fills in guesses provided by rights list.
 def printPrompt(word, rights):
 	for i in word:
 		if i in rights:
