@@ -21,29 +21,39 @@ def printPrompt(word, rights):
 	print()
 
 def main():
-	word = getText('wordlist.txt')
-	chars = list(word)
-	num = len(word)
-	lives = 6
+	fileName = "wordlist.txt"
+	word = getText(fileName)
+	max_guesses = 6
 	rights = []
-	printPrompt(word, rights)
-
-	while num > 0:
-		guess = input("Guess a letter: ")
-		if guess in chars:
-			print("Right")
-			chars.remove(guess)
-			rights.append(guess)
-			num = num - 1
-			if num == 0:
-				print("You guessed",word,"correctly!")
-		else:
-			print("Wrong")
-			lives = lives - 1
-			if lives == 0:
-				print("You lost.")
-				break
-
+	
+	print("Welcome to Hangman!")
+	
+	while max_guesses > 0:
 		printPrompt(word, rights)
+		
+		guess = input("Enter a letter: ").lower()
+		
+		if len(guess) != 1 or not guess.isalpha():
+			print("Please enter a valid single letter.")
+			continue
+		
+		if guess in rights:
+			print("You already guessed that letter.")
+			continue
+		
+		rights.append(guess)
+		
+		if guess not in word:
+			max_guesses -= 1
+			print(f"Wrong! You have {max_guesses} guesses left.")
+		
+		if all(letter in rights for letter in word):
+			printPrompt(word, rights)
+			print("Congratulations! You won!")
+			break
+		
+	if max_guesses == 0:
+		print(f"Sorry, you lost. The word was: {word}")
 
-main()
+if __name__ == "__main__":
+	main()
