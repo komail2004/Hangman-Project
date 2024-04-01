@@ -3,12 +3,14 @@ import math
 import random
 import time
 
-# Read the contents of the text file. Returns a string.
-def loadText():
-	# Open file
-	# Get count of lines in file
-	# Pick one at random and return its contents
-	pass
+# Function to get random line from a inputted text file.
+# Input should be the path to a file. Output will be a random line from that file as a string.
+def getText(fileName):
+	with open(fileName, 'r') as file:
+		lines = file.readlines()
+		randomLine = random.choice(lines)
+
+	return randomLine.replace('\n', '')
 
 #Coordinates
 x=800
