@@ -1,59 +1,67 @@
 #!/usr/bin/env python3
 
 import random
+import pygame
 
+x= 600	
+y= 800
+
+def window():
+	pygame.display.set_mode(x,y)
+	pygame.display.set_caption("Hangperson")
 # Function to get random line from text file.
-def getText(fileName):
-	with open(fileName, 'r') as file:
-		lines = file.readlines()
-		randomLine = random.choice(lines)
+# def getText(fileName):
+# 	with open(fileName, 'r') as file:
+# 		lines = file.readlines()
+# 		randomLine = random.choice(lines)
 
-	return randomLine.replace('\n', '')
+# 	return randomLine.replace('\n', '')
 
-# Print the prompt. Fills in guesses provided by rights list.
-def printPrompt(word, rights):
-	for i in word:
-		if i in rights:
-			print(i, end=' ')
-		else:
-			print("_", end=' ')
+# # Print the prompt. Fills in guesses provided by rights list.
+# def printPrompt(word, rights):
+# 	for i in word:
+# 		if i in rights:
+# 			print(i, end=' ')
+# 		else:
+# 			print("_", end=' ')
 
-	print()
+# 	print()
 
 def main():
-	fileName = "wordlist.txt"
-	word = getText(fileName).lower()
-	max_guesses = 6
-	rights = []
+	window()
+# 	fileName = "wordlist.txt"
+# 	word = getText(fileName).lower()
+# 	max_guesses = 6
+# 	rights = []
 	
-	print("Welcome to Hangman!")
+# 	print("Welcome to Hangman!")
 	
-	while max_guesses > 0:
-		printPrompt(word, rights)
+# 	while max_guesses > 0:
+# 		printPrompt(word, rights)
 		
-		guess = input("Enter a letter: ").lower()
+# 		guess = input("Enter a letter: ").lower()
 		
-		if len(guess) != 1 or not guess.isalpha():
-			print("Please enter a valid single letter.")
-			continue
+# 		if len(guess) != 1 or not guess.isalpha():
+# 			print("Please enter a valid single letter.")
+# 			continue
 		
-		if guess in rights:
-			print("You already guessed that letter.")
-			continue
+# 		if guess in rights:
+# 			print("You already guessed that letter.")
+# 			continue
 		
-		rights.append(guess)
+# 		rights.append(guess)
 		
-		if guess not in word:
-			max_guesses -= 1
-			print(f"Wrong! You have {max_guesses} guesses left.")
+# 		if guess not in word:
+# 			max_guesses -= 1
+# 			print(f"Wrong! You have {max_guesses} guesses left.")
 		
-		if all(letter in rights for letter in word):
-			printPrompt(word, rights)
-			print("Congratulations! You won!")
-			break
+# 		if all(letter in rights for letter in word):
+# 			printPrompt(word, rights)
+# 			print("Congratulations! You won!")
+# 			break
 		
-	if max_guesses == 0:
-		print(f"Sorry, you lost. The word was: {word}")
+# 	if max_guesses == 0:
+# 		print(f"Sorry, you lost. The word was: {word}")
 
 if __name__ == "__main__":
 	main()
