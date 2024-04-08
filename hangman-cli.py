@@ -7,8 +7,21 @@ x= 600
 y= 800
 
 def window():
-	pygame.display.set_mode(x,y)
+	#Creating the pygame's window
+	#Caption of the game
+	#Editing the window and updates
+	screen = pygame.display.set_mode((x,y))
+
 	pygame.display.set_caption("Hangperson")
+	screen.fill("blue")
+	pygame.display.flip()
+
+	running = True
+	while running:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running = False
+
 # Function to get random line from text file.
 # def getText(fileName):
 # 	with open(fileName, 'r') as file:
