@@ -7,7 +7,7 @@ import time
 #Initiating Pygame and assigning the x and y
 pygame.init()
 x= 600	
-y= 900
+y= 800
 
 def window():
 	#Creating the pygame's window
