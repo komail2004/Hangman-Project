@@ -4,7 +4,7 @@ import pygame
 # Initiating Pygame and assigning the x and y
 pygame.init()
 x = 600
-y = 800
+y = 600
 
 def window():
     # Creating the pygame's window
