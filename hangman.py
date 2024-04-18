@@ -32,7 +32,7 @@ class HangmanDisplay:
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
         self.font = pygame.font.Font(None, 36)
-        self.hangman_images = [pygame.image.load(f'hangman{i}.png') for i in range(7)]
+        self.hangman_images = [pygame.image.load(f'./images/hangman{i}.png') for i in range(7)]
 
     def update(self, hangman_status, display_word):
         self.screen.fill((255, 255, 255))
