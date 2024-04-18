@@ -1,79 +1,76 @@
 import pygame
+import random
 
-# Initiating Pygame and assigning the x and y
-pygame.init()
-x = 600
-y = 600
+class HangmanGame:
+    def __init__(self, filename):
+        self.word = self.get_word(filename)
+        self.guessed_letters = []
+        self.hangman_status = 0
+        self.win = False
 
-def window():
-    global active, user_text
-    # Creating the pygame's window
-    # Caption of the game
-    # Editing the window and updates
-    screen = pygame.display.set_mode((x, y))
-    pygame.display.set_caption("Hangperson")
+    def get_word(self, filename):
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+            return random.choice(lines).strip().lower()
 
-    # Creating a class for our text input area
-    class TextInput():
-        def __init__(self, rect, font, color_active, color_passive):
-            self.rect = pygame.Rect(rect)
-            self.font = pygame.font.Font(font, 32)
-            self.color_active = pygame.color.Color(color_active)
-            self.color_passive = pygame.color.Color(color_passive)
-            self.active = False
-            self.text = ''
+    def guess(self, letter):
+        if letter not in self.guessed_letters:
+            self.guessed_letters.append(letter)
+            if letter not in self.word:
+                self.hangman_status += 1
+            elif set(self.word) <= set(self.guessed_letters):
+                self.win = True
 
-    # Initialize the text input area
-    text_input = TextInput((200, 200, 140, 32), None, 'lightskyblue3', 'chartreuse4')
+    def is_game_over(self):
+        return self.hangman_status == 6 or self.win
 
-    # Creating a class for our Hangperson 
-    class Hangperson():
-        def __init__(self, image_path, size, position):
-            self.image = pygame.image.load(image_path).convert_alpha()
-            self.image = pygame.transform.scale(self.image, size)  # Assign to self.image, not self.size
-            self.position = position
+    def get_display_word(self):
+        return ' '.join([letter if letter in self.guessed_letters else '_' for letter in self.word])
 
-    # Assigning the class to character and creating it
-    character = Hangperson("images/sprite01.png", (200, 200), (200, 200))
+class HangmanDisplay:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((800, 600))
+        self.font = pygame.font.Font(None, 36)
+        self.hangman_images = [pygame.image.load(f'hangman{i}.png') for i in range(7)]
 
-    # The main loop of the game
+    def update(self, hangman_status, display_word):
+        self.screen.fill((255, 255, 255))
+        self.screen.blit(self.hangman_images[hangman_status], (200, 100))
+        word_label = self.font.render(display_word, 1, (0, 0, 0))
+        self.screen.blit(word_label, (50, 500))
+        pygame.display.update()
+
+    def quit(self):
+        pygame.quit()
+
+def main():
+    filename = "wordlist.txt"
+    game = HangmanGame(filename)
+    display = HangmanDisplay()
+
     running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if text_input.rect.collidepoint(event.pos):
-                    text_input.active = not text_input.active
-                else:
-                    text_input.active = False
-            if event.type == pygame.KEYDOWN:
-                if text_input.active:
-                    if event.key == pygame.K_BACKSPACE:
-                        text_input.text = text_input.text[:-1]
-                    else:
-                        text_input.text += event.unicode
+            elif event.type == pygame.KEYDOWN:
+                letter = pygame.key.name(event.key)
+                if len(letter) == 1 and letter.isalpha():
+                    game.guess(letter)
 
-        # Set background color
-        screen.fill((255, 255, 255))
+        display.update(game.hangman_status, game.get_display_word())
 
-        # Determine color of text input area
-        color = text_input.color_active if text_input.active else text_input.color_passive
+        if game.is_game_over():
+            running = False
 
-        # Draw the text input area
-        pygame.draw.rect(screen, color, text_input.rect, 2)
+    display.quit()
 
-        # Render and display the text
-        text_surface = text_input.font.render(text_input.text, True, (0, 0, 0))
-        screen.blit(text_surface, (text_input.rect.x + 5, text_input.rect.y + 5))
-
-        # Display the hangperson character
-        screen.blit(character.image, character.position)
-
-        pygame.display.flip()
-
-def main():
-    window()
+    if game.win:
+        print("Congratulations! You won!")
+    else:
+        print(f"Sorry, you lost. The word was: {game.word}")
 
 if __name__ == "__main__":
     main()
