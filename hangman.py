@@ -1,15 +1,18 @@
 import pygame
 import random
+import os
+import simpleaudio as sa
 
 class HangmanGame:
     def __init__(self, filename):
-        self.word = self.get_word(filename)
+        self.filename = filename
+        self.word = self.get_word()
         self.guessed_letters = []
         self.hangman_status = 0
         self.win = False
 
-    def get_word(self, filename):
-        with open(filename, 'r') as file:
+    def get_word(self):
+        with open(self.filename, 'r') as file:
             lines = file.readlines()
             return random.choice(lines).strip().lower()
 
@@ -24,6 +27,12 @@ class HangmanGame:
     def is_game_over(self):
         return self.hangman_status == 6 or self.win
 
+    def reset(self):
+        self.word = self.get_word()
+        self.guessed_letters = []
+        self.hangman_status = 0
+        self.win = False
+
     def get_display_word(self):
         return ' '.join([letter if letter in self.guessed_letters else '_' for letter in self.word])
 
@@ -32,7 +41,7 @@ class HangmanDisplay:
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
         self.font = pygame.font.Font(None, 36)
-        self.hangman_images = [pygame.image.load(f'./images/hangman{i}.png') for i in range(7)]
+        self.hangman_images = [pygame.image.load(f'images/hangman{i}.png') for i in range(7)]
 
     def update(self, hangman_status, display_word):
         self.screen.fill((255, 255, 255))
@@ -41,6 +50,9 @@ class HangmanDisplay:
         self.screen.blit(word_label, (50, 500))
         pygame.display.update()
 
+    def play_sound(self, sound):
+        sound.play()
+
     def quit(self):
         pygame.quit()
 
@@ -48,6 +60,11 @@ def main():
     filename = "wordlist.txt"
     game = HangmanGame(filename)
     display = HangmanDisplay()
+    pygame.mixer.init()
+    correct_sound = pygame.mixer.Sound(os.path.join('sound', 'correct_guess.wav'))
+    incorrect_sound = pygame.mixer.Sound(os.path.join('sound', 'wrong_guess.wav'))
+    win_sound = pygame.mixer.Sound(os.path.join('sound', 'winning_sound.wav'))
+    lose_sound = pygame.mixer.Sound(os.path.join('sound', 'losing_sound.wav'))
 
     running = True
 
@@ -58,19 +75,23 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 letter = pygame.key.name(event.key)
                 if len(letter) == 1 and letter.isalpha():
+                    if letter in game.word:
+                        pygame.mixer.Sound.play(correct_sound)
+                    else:
+                        pygame.mixer.Sound.play(incorrect_sound)
                     game.guess(letter)
 
         display.update(game.hangman_status, game.get_display_word())
 
         if game.is_game_over():
-            running = False
+            if game.win:
+                pygame.mixer.Sound.play(win_sound)
+            else:
+                pygame.mixer.Sound.play(lose_sound)
+            pygame.time.delay(2000)  # Delay for 2 seconds
+            game.reset()
 
     display.quit()
-
-    if game.win:
-        print("Congratulations! You won!")
-    else:
-        print(f"Sorry, you lost. The word was: {game.word}")
 
 if __name__ == "__main__":
     main()
