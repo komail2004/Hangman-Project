@@ -50,9 +50,6 @@ class HangmanDisplay:
         self.screen.blit(word_label, (50, 500))
         pygame.display.update()
 
-    def play_sound(self, sound):
-        sound.play()
-
     def quit(self):
         pygame.quit()
 
@@ -127,6 +124,7 @@ def main():
                         elif 500 <= mouse_x <= 700 and 300 <= mouse_y <= 350:  # Quit button clicked
                             running = False
                             menu_screen = False
+                            break  # Exit the menu loop and the game loop
 
     display.quit()
 
