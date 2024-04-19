@@ -43,15 +43,56 @@ class HangmanDisplay:
         self.font = pygame.font.Font(None, 36)
         self.hangman_images = [pygame.image.load(f'images/hangman{i}.png') for i in range(7)]
 
-    def update(self, hangman_status, display_word):
+    def update(self, hangman_status, display_word, outcome, word=None):  # Accept word as an argument
         self.screen.fill((255, 255, 255))
         self.screen.blit(self.hangman_images[hangman_status], (200, 100))
         word_label = self.font.render(display_word, 1, (0, 0, 0))
         self.screen.blit(word_label, (50, 500))
+
+        if outcome == "lose" and word is not None:  # Check if word is provided and the outcome is "lose"
+            word_text = self.font.render("The word was: " + word, 1, (255, 0, 0))
+            self.screen.blit(word_text, (50, 550))
+
         pygame.display.update()
 
     def quit(self):
         pygame.quit()
+
+def game_over_menu(display, outcome, word=None):  # Accept word as an argument
+    menu_screen = True
+    while menu_screen:
+        display.screen.fill((255, 255, 255))
+        if outcome == "win":
+            text = display.font.render("Congratulations! You won!", True, (0, 0, 0))
+        else:
+            text = display.font.render("Sorry, you lost.", True, (0, 0, 0))
+        display.screen.blit(text, (50, 200))
+
+        if word is not None:  # Display the word if available
+            word_text = display.font.render("The word was: " + word, True, (255, 0, 0))
+            display.screen.blit(word_text, (50, 250))
+
+        replay_button = pygame.Rect(100, 300, 200, 50)
+        pygame.draw.rect(display.screen, (0, 255, 0), replay_button)
+        replay_text = display.font.render("Replay", True, (0, 0, 0))
+        display.screen.blit(replay_text, (150, 310))
+
+        quit_button = pygame.Rect(500, 300, 200, 50)
+        pygame.draw.rect(display.screen, (255, 0, 0), quit_button)
+        quit_text = display.font.render("Quit", True, (0, 0, 0))
+        display.screen.blit(quit_text, (570, 310))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if 100 <= mouse_x <= 300 and 300 <= mouse_y <= 350:  # Replay button clicked
+                    return True
+                elif 500 <= mouse_x <= 700 and 300 <= mouse_y <= 350:  # Quit button clicked
+                    return False
 
 def main():
     filename = "wordlist.txt"
@@ -79,8 +120,7 @@ def main():
                         pygame.mixer.Sound.play(incorrect_sound)
                     game.guess(letter)
 
-        display.update(game.hangman_status, game.get_display_word())
-
+        display.update(game.hangman_status, game.get_display_word(), outcome, game.word)  # Pass the word
         if game.is_game_over() and outcome == "":
             if game.win:
                 pygame.mixer.Sound.play(win_sound)
@@ -90,41 +130,12 @@ def main():
                 outcome = "lose"
 
         if outcome:
-            menu_screen = True
-            while menu_screen:
-                display.screen.fill((255, 255, 255))
-                if outcome == "win":
-                    text = display.font.render("Congratulations! You won!", True, (0, 0, 0))
-                else:
-                    text = display.font.render("Sorry, you lost. The word was: ", True, (0, 0, 0))
-                display.screen.blit(text, (50, 200))
-
-                replay_button = pygame.Rect(100, 300, 200, 50)
-                pygame.draw.rect(display.screen, (0, 255, 0), replay_button)
-                replay_text = display.font.render("Replay", True, (0, 0, 0))
-                display.screen.blit(replay_text, (150, 310))
-
-                quit_button = pygame.Rect(500, 300, 200, 50)
-                pygame.draw.rect(display.screen, (255, 0, 0), quit_button)
-                quit_text = display.font.render("Quit", True, (0, 0, 0))
-                display.screen.blit(quit_text, (570, 310))
-
-                pygame.display.update()
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-                        menu_screen = False
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        if 100 <= mouse_x <= 300 and 300 <= mouse_y <= 350:  # Replay button clicked
-                            game.reset()
-                            outcome = ""
-                            menu_screen = False
-                        elif 500 <= mouse_x <= 700 and 300 <= mouse_y <= 350:  # Quit button clicked
-                            running = False
-                            menu_screen = False
-                            break  # Exit the menu loop and the game loop
+            replay = game_over_menu(display, outcome, game.word)  # Pass the word
+            if not replay:
+                running = False
+            else:
+                game.reset()
+                outcome = ""
 
     display.quit()
 
